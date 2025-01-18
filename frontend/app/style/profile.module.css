@@ -1,0 +1,100 @@
+.container {
+    display: flex;
+    gap: 24px;
+    padding: 16px;
+  }
+  
+  .gallery {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .gallery h3 {
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    color: #333;
+  }
+  
+  .imageGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  
+  .imageBox {
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .imageBox img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .imageBox:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .uploadButton {
+    margin-top: 16px;
+  }
+  
+  .profile {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile h2 {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+    color: #333;
+  }
+  
+  .avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin-bottom: 16px;
+    border: 2px solid #ddd;
+  }
+  
+  .bioInput {
+    width: 100%;
+    margin-top: 16px;
+  }
+  
+  .updateButton {
+    margin-top: 16px;
+    align-self: flex-end;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .updateButton:hover {
+    background-color: #0056b3;
+  }
