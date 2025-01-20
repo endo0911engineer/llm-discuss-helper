@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Message
 from transformers import pipeline
+from .models import Topic
 
 # 要約用のパイプライン作成
 summarizer = pipeline("summarization")
@@ -47,3 +48,19 @@ def post_message(request):
             'message': 'Message created successfully!',
             'message_id': message.id
         }, status=status.HTTP_201_CREATED) 
+    
+
+@api_view(['GET'])
+def get_topics(request):
+    topics = Topic.objects.all().order_by('-created_at')
+    topics_data = [
+        {
+            'id': topic.id,
+            'title': topic.title,
+            'description': topic.description,
+            'created_by': topic.created_by.username,
+            'created_at': topic.created_at.isoformat(),
+        }
+        for topic in topics
+    ]
+    return Response(topics_data, status=status.HTTP_200_OK)

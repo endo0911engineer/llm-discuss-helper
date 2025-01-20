@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'app',
     'rest_framework',
     'users',
-    'messages',
+    'chat',
     'rest_framework_simplejwt',
     'corsheaders',
 ]
