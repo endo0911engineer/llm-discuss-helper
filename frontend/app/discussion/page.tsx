@@ -71,63 +71,64 @@ export default function DiscussionPage() {
     };
 
     return (
-        <div className={styles.container}>
-        <h1 className={styles.heading}>議論ページ</h1>
-  
-        {/* 議題入力 */}
-        <div className={styles.section}>
-          <h2>議題を設定</h2>
-          <input
-            type="text"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder="議題を入力してください"
-            className={styles.input}
-          />
-          <button onClick={handleTopicSubmit} className={styles.button}>
-            議題を設定
-          </button>
-        </div>
-  
-        {/* メッセージ表示 */}
-        <div className={styles.section}>
-          <h2>議論</h2>
-          <div className={styles.messageList}>
-            {messages.map((msg) => (
-              <div key={msg.id} className={styles.messageItem}>
+      <div className={styles.container}>
+      <h1 className={styles.heading}>議論ページ</h1>
+
+      {/* 議題入力 */}
+      <div className={styles.section}>
+        <h2>議題を設定</h2>
+        <input
+          type="text"
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          placeholder="議題を入力してください"
+          className={styles.input}
+        />
+        <button onClick={handleTopicSubmit} className={styles.button}>
+          議題を設定
+        </button>
+      </div>
+
+      {/* メッセージ表示 */}
+      <div className={styles.section}>
+        <h2>議論</h2>
+        <div className={styles.messageList}>
+          {messages.map((msg) => (
+            <div key={msg.id} className={styles.messageItem}>
+              <img
+                src={msg.user_icon}
+                alt={`${msg.user}のアイコン`}
+                className={styles.messageIcon}
+              />
+              <div>
                 <strong className={styles.messageUser}>{msg.user}</strong>: 
                 <span className={styles.messageText}>{msg.text}</span>
                 <br />
                 <small className={styles.messageDate}>{new Date(msg.created_at).toLocaleString()}</small>
               </div>
-            ))}
-          </div>
-        </div>
-  
-        {/* メッセージ送信 */}
-        <div className={styles.section}>
-          <textarea
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            rows={3}
-            placeholder="メッセージを入力してください"
-            className={styles.textarea}
-          ></textarea>
-          <button
-            onClick={handleSendMessage}
-            disabled={loading}
-            className={styles.button}
-            style={{ backgroundColor: loading ? '#ccc' : undefined }}
-          >
-            {loading ? '送信中...' : '送信'}
-          </button>
-        </div>
-  
-        {/* 結論表示 */}
-        <div className={styles.section}>
-          <h2>結論</h2>
-          <p className={styles.summary}>{summary}</p>
+            </div>
+          ))}
         </div>
       </div>
+
+      {/* メッセージ送信 */}
+      <div className={styles.section}>
+        <textarea
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          rows={3}
+          placeholder="メッセージを入力してください"
+          className={styles.textarea}
+        ></textarea>
+        <button
+          onClick={handleSendMessage}
+          disabled={loading}
+          className={styles.button}
+          style={{ backgroundColor: loading ? '#ccc' : undefined }}
+        >
+          {loading ? '送信中...' : '送信'}
+        </button>
+      </div>
+    </div>
     );
 }

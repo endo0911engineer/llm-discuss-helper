@@ -1,100 +1,149 @@
-.container {
-    display: flex;
-    gap: 24px;
-    padding: 16px;
+/* Profile Page */
+.profileContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100px 20px; /* ヘッダーの高さを考慮 */
+  background-color: #121212;
+  min-height: 100vh;
+  color: #fff;
+}
+
+.profileHeader {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.profileHeader h2 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #00e6e6;
+}
+
+.profileAvatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 4px solid #00e6e6;
+  margin-bottom: 20px;
+}
+
+.uploadAvatar {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.bioSection {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.bioInput {
+  width: 100%;
+  background-color: #1e1e1e;
+  color: #fff;
+  border: 2px solid #00e6e6;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 1rem;
+  margin-top: 10px;
+}
+
+.bioInput:focus {
+  outline: none;
+  border-color: #00cccc;
+}
+
+.updateButton {
+  background-color: #00e6e6;
+  color: #121212;
+  border: none;
+  border-radius: 30px;
+  padding: 15px 30px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 20px;
+  display: inline-block;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.updateButton:hover {
+  background-color: #121212;
+  color: #00e6e6;
+  border: 2px solid #00e6e6;
+}
+
+/* Discussion Section */
+.discussionSection {
+  margin-top: 40px;
+  width: 100%;
+  max-width: 800px;
+  background-color: #1e1e1e;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.discussionSection h3 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: #00e6e6;
+}
+
+.discussionList {
+  list-style: none;
+  padding: 0;
+}
+
+.discussionItem {
+  border-bottom: 1px solid #333;
+  padding: 10px 0;
+}
+
+.discussionItem:last-child {
+  border-bottom: none;
+}
+
+.discussionItem strong {
+  color: #00e6e6;
+}
+
+.discussionItem p {
+  margin: 5px 0;
+  color: #ccc;
+}
+
+.discussionItem span {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.newDiscussionButton {
+  margin-top: 20px;
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  border-radius: 30px;
+  background-color: #00e6e6;
+  color: #121212;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.newDiscussionButton:hover {
+  background-color: #121212;
+  color: #00e6e6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .bioSection,
+  .discussionSection {
+    max-width: 100%;
   }
-  
-  .gallery {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    padding: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .profileHeader h2 {
+    font-size: 2rem;
   }
-  
-  .gallery h3 {
-    font-size: 1.2rem;
-    margin-bottom: 16px;
-    color: #333;
-  }
-  
-  .imageGrid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
-  }
-  
-  .imageBox {
-    width: 100px;
-    height: 100px;
-    cursor: pointer;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  
-  .imageBox img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .imageBox:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-  
-  .uploadButton {
-    margin-top: 16px;
-  }
-  
-  .profile {
-    flex: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .profile h2 {
-    font-size: 1.5rem;
-    margin-bottom: 16px;
-    color: #333;
-  }
-  
-  .avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    margin-bottom: 16px;
-    border: 2px solid #ddd;
-  }
-  
-  .bioInput {
-    width: 100%;
-    margin-top: 16px;
-  }
-  
-  .updateButton {
-    margin-top: 16px;
-    align-self: flex-end;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .updateButton:hover {
-    background-color: #0056b3;
-  }
+}

@@ -1,103 +1,121 @@
-.container {
-  font-family: 'Arial', sans-serif;
-  color: #333;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  background-color: #1da1f2;
-  color: white;
+  background-color: transparent;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
 .logo {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: bold;
+  color: #00e6e6;
 }
 
 .navbar {
   display: flex;
-  gap: 15px;
 }
 
 .navLink {
-  color: white;
+  margin-left: 20px;
+  color: #fff;
   text-decoration: none;
   font-size: 1rem;
-  transition: opacity 0.3s ease;
+  position: relative;
 }
 
-.navLink:hover {
-  opacity: 0.7;
+.navLink::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #00e6e6;
+  transform: scaleX(0);
+  transition: transform 0.3s ease-in-out;
 }
 
+.navLink:hover::after {
+  transform: scaleX(1);
+}
+
+/* Hero Section */
 .heroSection {
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
-  height: 80vh;
-  background: linear-gradient(120deg, #89f7fe, #66a6ff);
-  color: white;
+  background: url('/hero-bg.jpg') center center/cover no-repeat;
+  position: relative;
+}
+
+.heroContent {
   text-align: center;
+  z-index: 2;
 }
 
 .heroTitle {
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 .heroSubtitle {
   font-size: 1.2rem;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 .buttonGroup {
   display: flex;
-  gap: 15px;
+  justify-content: center;
+}
+
+.primaryButton, .secondaryButton {
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  border-radius: 30px;
+  text-decoration: none;
+  margin: 0 10px;
+  text-align: center;
+  cursor: pointer;
 }
 
 .primaryButton {
-  padding: 10px 20px;
-  background-color: #1da1f2;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
+  background-color: #00e6e6;
+  color: #121212;
+  border: 2px solid #00e6e6;
 }
 
 .primaryButton:hover {
-  background-color: #0d8bf2;
+  background-color: #121212;
+  color: #00e6e6;
 }
 
 .secondaryButton {
-  padding: 10px 20px;
-  background-color: white;
-  color: #1da1f2;
-  border: 2px solid #1da1f2;
-  border-radius: 5px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  background-color: transparent;
+  color: #fff;
+  border: 2px solid #fff;
 }
 
 .secondaryButton:hover {
-  background-color: #1da1f2;
-  color: white;
+  background-color: #00e6e6;
+  color: #121212;
 }
 
+/* Footer */
 .footer {
+  padding: 20px;
   text-align: center;
-  padding: 15px;
-  background-color: #f1f1f1;
-  font-size: 0.9rem;
-  color: #666;
+  background-color: #121212;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  color: #fff;
 }

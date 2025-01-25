@@ -17,10 +17,11 @@ class Message(models.Model):
 
 
 class Topic(models.Model):
-    title = models.CharField(max_length=255)  # 議題のタイトル
-    description = models.TextField(blank=True, null=True)  # 議題の詳細説明
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)  # 議題の作成者
-    created_at = models.DateTimeField(auto_now_add=True)  # 作成日時
+    title = models.CharField(max_length=255)  
+    description = models.TextField(blank=True, null=True)  
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    participants = models.ManyToManyField(User, related_name='participating_topics')  
+    created_at = models.DateTimeField(auto_now_add=True) 
 
     def __str__(self):
         return self.title

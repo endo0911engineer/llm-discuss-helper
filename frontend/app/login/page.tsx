@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import styles from '../style/signup.module.css';
+import styles from '../style/login.module.css';
 import { useRouter } from 'next/navigation';
 
 export default function SignupPage() {
@@ -45,6 +45,7 @@ export default function SignupPage() {
 
     return (
         <main className={styles.container}>
+          <div className={styles.formContainer}>
           <h1 className={styles.title}>Log In</h1>
           <form onSubmit={handleLogin} className={styles.form}>
             <div className={styles.inputGroup}>
@@ -72,6 +73,7 @@ export default function SignupPage() {
             <button type="submit" className={styles.button}>LogIn</button>
           </form>
           {error && <p className={styles.error}>{error}</p>}
+          </div>
         </main>
     );
 }

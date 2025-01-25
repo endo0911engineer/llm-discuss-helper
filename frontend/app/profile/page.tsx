@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from '../style/profile.module.css';
-import { useDropzone } from "react-dropzone";
 
 interface UserProfile{
     username: string,
@@ -13,11 +12,21 @@ interface UserProfile{
     images: string[];
 }
 
+interface Discussion {
+  id: number;
+  topic: string;
+  summary: string;
+  timestamp: string;
+}
+
+
+
 export default function ProfilePage () {
     const router = useRouter();
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const [bio, setBio] = useState<string>('');
     const [avatar, setAvatar] = useState<File | null>(null);
+    const [discussions, setDiscussions] = useState<Discussion[]>([]);
 
     useEffect(() => {
         //プロフィール情報取得
@@ -36,9 +45,24 @@ export default function ProfilePage () {
             }
         };
 
-        fetchProfile();
-    }, []);
+        // ディスカッション履歴取得
+        const fetchDiscussion = async () => {
+          try {
+            const response = await fetch('http://127.0.0.1:8000/api/get_topics/', {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+              },
+            });
+            const discussionData = await response.json();
+            setDiscussions(discussionData);
+          } catch (error) {
+            console.error('Error fetching discussions:', error);
+          };
+        }
 
+        fetchProfile();
+        fetchDiscussion();
+      }, []);
 
     // プロフィール更新
     const handleProfileUpdate = async () => {
@@ -112,6 +136,27 @@ export default function ProfilePage () {
                 </button>
               </>
             )}
+          </div>
+          <div className={styles.discussions}>
+            <h3>過去のディスカッション履歴</h3>
+            {discussions.length > 0 ? (
+              <ul>
+                {discussions.map((discussion) => (
+                  <li>
+                    <strong>トピック：</strong> {discussion.topic}
+                    <br />
+                    <strong>概要：</strong> {discussion.summary}
+                    <br />
+                    <strong>日時：</strong> {new Date(discussion.timestamp).toLocaleString()}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>ディスカッション履歴がありません。</p>
+            )}
+            <button className={styles.newDiscussionButton} onClick={() => router.push('/create-discussion')}>
+              新しいディスカッションを作る
+            </button>
           </div>
         </div>
     );

@@ -1,9 +1,11 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Message
 from transformers import pipeline
 from .models import Topic
+from django.contrib.auth.models import User
 
 # 要約用のパイプライン作成
 summarizer = pipeline("summarization")
@@ -51,8 +53,10 @@ def post_message(request):
     
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated]) 
 def get_topics(request):
-    topics = Topic.objects.all().order_by('-created_at')
+    user = request.user
+    topics = Topic.objects.filter(participants=user).order_by('-created_at') # 自分が参加しているトピック
     topics_data = [
         {
             'id': topic.id,
@@ -64,3 +68,54 @@ def get_topics(request):
         for topic in topics
     ]
     return Response(topics_data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_topic(request):
+    title = request.data.get('title')
+    description = request.data.get('description')
+    invited_user_ids = request.data.get('invalid_users', []) # 招待するユーザー
+
+    if not title or not description:
+        return Response({'error': 'Title and description are required.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # トピックを作成
+        topic = Topic.create(
+            title=title,
+            description=description,
+            created_by=request.user
+        )
+
+        # 招待するユーザーをトピックに追加
+        invited_users = User.objects.filter(id__in=invited_user_ids)
+        topic.participants.set(invited_users) #多対多関係をユーザーに追加
+        topic.participants.add(request.user) # 作成者も自動的に参加
+
+        return Response({'message': 'Topic created successfully.', 'topic_id': topic.id}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_topic_detail(request, topic_id):
+    try:
+        topic=Topic.objects.get(id=topic_id)
+
+        # アクセス制御：ユーザーが参加しているか確認
+        if request.user not in topic.participants.all():
+            return Response({'error': 'You do not have access to this topic.'}, status=status.HTTP_403_FORBIDDEN)
+        
+        topic_data = {
+            'id': topic.id,
+            'title': topic.title,
+            'description': topic.description,
+            'created_by': topic.created_by.username,
+            'created_at': topic.created_at.isoformat(),
+            'participants': [user.username for user in topic.participants.all()]
+        }
+        return Response(topic_data, status=status.HTTP_200_OK)
+    except Topic.DoesNotExist:
+        return Response({'error': 'Topic not found.'}, status=status.HTTP_404_NOT_FOUND)
