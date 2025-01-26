@@ -6,9 +6,11 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import authenticate
 from rest_framework import status
 from django.contrib.auth.models import User
+from .models import Topic
 from .serializers import UserSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view
 
 class RegisterAPIView(APIView):
     def post(self, request):
@@ -65,3 +67,42 @@ class LoginAPIView(APIView):
         else:
             # 認証失敗の場合
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+
+
+@api_view(['GET'])
+def get_followers(request):
+    user = request.user
+    followers = user.followers.all()
+    followers_data = [
+        {
+            "id": follower.follower.id,
+            "username": follower.follower.username,
+        }
+        for follower in followers
+    ]
+    return Response({"followers": followers_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def invite_users(request):
+    topic_id = request.data.get('topic_id')
+    invited_user_ids = request.data.get('user_ids', [])
+
+    if not topic_id or not invited_user_ids:
+        return Response({'error': 'Topic ID and user IDs are required.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        topic = Topic.objects.get(id=topic_id)
+
+        # 既に参加している場合除外
+        existing_participants = topic.participants.values_list('id', flat=True)
+        new_users = User.objects.filter(id__in=invited_user_ids).exclude(id__in=existing_participants)
+
+        # 招待をユーザーを追加
+        topic.participants.add(*new_users)
+
+    except Topic.DoesNotExist:
+        return Response({'error': 'Topic not found.'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
