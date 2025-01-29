@@ -6,6 +6,7 @@ from .models import Message
 from transformers import pipeline
 from .models import Topic
 from django.contrib.auth.models import User
+import uuid
 
 # 要約用のパイプライン作成
 summarizer = pipeline("summarization")
@@ -75,25 +76,22 @@ def get_topics(request):
 def create_topic(request):
     title = request.data.get('title')
     description = request.data.get('description')
-    invited_user_ids = request.data.get('invalid_users', []) # 招待するユーザー
 
     if not title or not description:
         return Response({'error': 'Title and description are required.'}, status=status.HTTP_400_BAD_REQUEST)
     
+    # 一意のIDを作成
+    topic_id = str(uuid.uuid4())
+
     try:
         # トピックを作成
         topic = Topic.create(
             title=title,
             description=description,
-            created_by=request.user
+            topic_id=topic_id
         )
 
-        # 招待するユーザーをトピックに追加
-        invited_users = User.objects.filter(id__in=invited_user_ids)
-        topic.participants.set(invited_users) #多対多関係をユーザーに追加
-        topic.participants.add(request.user) # 作成者も自動的に参加
-
-        return Response({'message': 'Topic created successfully.', 'topic_id': topic.id}, status=status.HTTP_201_CREATED)
+        return Response({'message': 'Topic created successfully.', 'topic_id': topic.topic_id}, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     

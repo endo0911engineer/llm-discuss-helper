@@ -37,7 +37,9 @@ export default function ProfilePage () {
                         Authorization: `Bearer ${localStorage.getItem('access_token')}`,   
                     },
                 });
+
                 const profileData = await response.json();
+                console.log('Fetched Data:', profileData);
                 setUserProfile(profileData);
                 setBio(profileData.bio || '');
             } catch (error) {
@@ -73,6 +75,8 @@ export default function ProfilePage () {
                 formData.append('avatar', avatar);
             }
 
+            console.log('FormData:', formData.get('bio'), formData.get('avatar'))
+
             const response = await fetch('http://127.0.0.1:8000/api/profile/', {
                 method: 'PUT',
                 body: formData,
@@ -82,7 +86,9 @@ export default function ProfilePage () {
             });
 
             if (response.ok) {
+              const updatedData = await response.json();
               alert('プロフィールが更新されました');
+              setUserProfile(updatedData);
               router.push('/profile');
             } else {
               console.error('Failed to update profile.');

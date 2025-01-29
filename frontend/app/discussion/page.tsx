@@ -6,10 +6,44 @@ import styles from '../style/DiscussionPage.module.css';
 export default function DiscussionPage() {
     const [user, setUser] = useState(null);
     const [topic, setTopic] = useState('');
-    const [messages, setMessages] = useState<{ id: number; user: string; text: string; created_at: string }[]>([]);
+    const [messages, setMessages] = useState<{ id: number; user: string; text: string; created_at: string; user_icon: string }[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [summary, setSummary] = useState('');
     const [loading, setLoading] = useState(false);
+    const [socket, setSocket] = useState<WebSocket | null>(null);
+    
+    const roomName = 'your_room_name'; 
+
+    // WebSocket接続の設定
+    useEffect(() => {
+      const chatSocket = new WebSocket(
+        `ws://${window.location.host}/ws/chat/${roomName}/`
+      );
+
+      chatSocket.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        setMessages((prev) => [
+          ...prev,
+          { id: Date.now(), 
+            user: data.user, 
+            text: data.message, 
+            created_at: new Date().toISOString(),
+            user_icon: data.user_icon || "/default-icon.png" 
+          }
+        ]);
+      };
+
+      chatSocket.onclose = () => {
+        console.error('Chat socket closed unexpectedly');
+      };
+
+      setSocket(chatSocket);
+
+      // クリーンアップ
+      return () => {
+        chatSocket.close();
+      };
+    }, [roomName]);
 
     // 議論データをバックエンドから取得
     useEffect(() => {
@@ -53,12 +87,22 @@ export default function DiscussionPage() {
                 const data = await res.json();
                 setMessages((prev) => [
                     ...prev,
-                    { id: data.message_id, user: 'You', text: newMessage, created_at: new Date().toISOString() },
+                    { id: data.message_id,
+                      user: 'You', 
+                      text: newMessage, 
+                      created_at: new Date().toISOString(),
+                      user_icon: data.user_icon || "/default-icon.png" 
+                    },
                   ]);
                 setNewMessage('');
             }
         } catch (error) {
             console.error('Error sending message:', error);
+        }
+
+        // WebSocket経由でメッセージを送信
+        if (socket && newMessage) {
+          socket.send(JSON.stringify({ message: newMessage }));
         }
 
         setLoading(false);
@@ -73,21 +117,6 @@ export default function DiscussionPage() {
     return (
       <div className={styles.container}>
       <h1 className={styles.heading}>議論ページ</h1>
-
-      {/* 議題入力 */}
-      <div className={styles.section}>
-        <h2>議題を設定</h2>
-        <input
-          type="text"
-          value={topic}
-          onChange={(e) => setTopic(e.target.value)}
-          placeholder="議題を入力してください"
-          className={styles.input}
-        />
-        <button onClick={handleTopicSubmit} className={styles.button}>
-          議題を設定
-        </button>
-      </div>
 
       {/* メッセージ表示 */}
       <div className={styles.section}>

@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'chat',
     'rest_framework_simplejwt',
     'corsheaders',
+    'channels',
 ]
 
 
@@ -130,3 +131,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", 
 ]
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],  # Redisのホスト設定
+        },
+    },
+}
