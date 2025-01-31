@@ -1,9 +1,14 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import styles from '../style/DiscussionPage.module.css';
+import styles from '../../style/DiscussionPage.module.css';
+import { useRouter } from "next/navigation";
+import { use } from 'react';
 
-export default function DiscussionPage() {
+export default function DiscussionPage({ params }: { params: Promise<{ id: string }> }) {
+    const resolvedParams = use(params);
+    const { id } = resolvedParams;
+
     const [user, setUser] = useState(null);
     const [topic, setTopic] = useState('');
     const [messages, setMessages] = useState<{ id: number; user: string; text: string; created_at: string; user_icon: string }[]>([]);
@@ -11,13 +16,11 @@ export default function DiscussionPage() {
     const [summary, setSummary] = useState('');
     const [loading, setLoading] = useState(false);
     const [socket, setSocket] = useState<WebSocket | null>(null);
-    
-    const roomName = 'your_room_name'; 
 
     // WebSocket接続の設定
     useEffect(() => {
       const chatSocket = new WebSocket(
-        `ws://${window.location.host}/ws/chat/${roomName}/`
+        `ws://${window.location.host}/ws/chat/${id}/`
       );
 
       chatSocket.onmessage = (e) => {
@@ -43,7 +46,7 @@ export default function DiscussionPage() {
       return () => {
         chatSocket.close();
       };
-    }, [roomName]);
+    }, [id]);
 
     // 議論データをバックエンドから取得
     useEffect(() => {
@@ -77,9 +80,12 @@ export default function DiscussionPage() {
         setLoading(true);
 
         try {
-            const res = await fetch('http://localhost:8000/api/messages/post', {
+            const res = await fetch('http://localhost:8000/api/messages/post/', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                  'Content-Type': 'application/json', 
+                  'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                },
                 body: JSON.stringify({ message: newMessage }),
             });
 

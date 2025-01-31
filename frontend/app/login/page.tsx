@@ -28,7 +28,6 @@ export default function SignupPage() {
 
         if (response.ok) {
 
-            // Save tokens in localStorage or cookies
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('refresh_token', data.refresh_token);
 

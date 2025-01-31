@@ -19,8 +19,6 @@ interface Discussion {
   timestamp: string;
 }
 
-
-
 export default function ProfilePage () {
     const router = useRouter();
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -56,6 +54,7 @@ export default function ProfilePage () {
               },
             });
             const discussionData = await response.json();
+            console.log(discussionData);
             setDiscussions(discussionData);
           } catch (error) {
             console.error('Error fetching discussions:', error);
@@ -64,7 +63,15 @@ export default function ProfilePage () {
 
         fetchProfile();
         fetchDiscussion();
-      }, []);
+    }, []);
+
+    //ログアウト
+    const handleLogout = () => {
+      localStorage.removeItem('access_token');
+      window.location.href = '/login';
+    }
+
+    
 
     // プロフィール更新
     const handleProfileUpdate = async () => {
@@ -108,6 +115,7 @@ export default function ProfilePage () {
 
     return (
         <div className={styles.container}>
+          <button onClick={handleLogout}>ログアウト</button>
           {/* プロフィール情報 */}
           <div className={styles.profile}>
             {userProfile && (

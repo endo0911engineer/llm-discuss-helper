@@ -33,13 +33,16 @@ export default function createDiscussionPage() {
             });
 
             if (response.ok) {
+                const data = await response.json()
+                setDiscussionId(data.topic_id);
                 alert('ディスカッションが作成されました！');
-                router.push('/profile');
             } else {
                 console.error('Failed to create discussion');
             }
         } catch (error) {
             console.error('Error creatong discussion:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -77,6 +80,10 @@ export default function createDiscussionPage() {
                     />
                 <button onClick={() => navigator.clipboard.writeText(`${window.location.origin}/discussion/${discussionId}`)}>
                     コピーする
+                </button>
+
+                <button onClick={() => router.push(`/discussion/${discussionId}`)}>
+                    ディスカッションに移動
                 </button>
                 </div>
             )}

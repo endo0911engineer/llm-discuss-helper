@@ -37,6 +37,7 @@ def message_list(request):
     }, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated]) 
 def post_message(request):
     if request.method == 'POST':
         message_text = request.POST.get('message')
@@ -82,16 +83,22 @@ def create_topic(request):
     
     # 一意のIDを作成
     topic_id = str(uuid.uuid4())
+    # ログインユーザーを取得
+    user = request.user
 
     try:
         # トピックを作成
-        topic = Topic.create(
+        topic = Topic.objects.create(
             title=title,
             description=description,
+            created_by=user,
             topic_id=topic_id
         )
 
-        return Response({'message': 'Topic created successfully.', 'topic_id': topic.topic_id}, status=status.HTTP_201_CREATED)
+        return Response({
+            'message': 'Topic created successfully.', 
+            'topic_id': topic.topic_id
+            }, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     

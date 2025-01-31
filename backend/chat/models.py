@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 import uuid
 
 class Message(models.Model):
@@ -23,6 +24,7 @@ class Topic(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True) 
     topic_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    participants = models.ManyToManyField(User, related_name="topics")
 
     def __str__(self):
         return self.title
