@@ -5,18 +5,20 @@ import { useEffect, useState } from "react";
 import styles from '../style/profile.module.css';
 
 interface UserProfile{
-    username: string,
-    email: string,
-    bio: string,
-    avatar: string,
-    images: string[];
+  username: string,
+  email: string,
+  bio: string,
+  avatar: string,
+  images: string[];
 }
 
 interface Discussion {
-  id: number;
-  topic: string;
-  summary: string;
-  timestamp: string;
+  id: string,
+  title: string,  
+  description: string,  
+  created_by: string,
+  created_at: Date,
+  participants: string[];
 }
 
 export default function ProfilePage () {
@@ -156,12 +158,16 @@ export default function ProfilePage () {
             {discussions.length > 0 ? (
               <ul>
                 {discussions.map((discussion) => (
-                  <li>
-                    <strong>トピック：</strong> {discussion.topic}
+                  <li key={discussion.id}>
+                    <strong>トピック：</strong> {discussion.title}
                     <br />
-                    <strong>概要：</strong> {discussion.summary}
+                    <strong>概要：</strong> {discussion.description}
                     <br />
-                    <strong>日時：</strong> {new Date(discussion.timestamp).toLocaleString()}
+                    <strong>日時：</strong> {new Date(discussion.created_by).toLocaleString()}
+                    <br />
+                    <button onClick={() => router.push(`/discussion/${discussion.id}`)}>
+                      ディスカッションに移動
+                    </button>
                   </li>
                 ))}
               </ul>

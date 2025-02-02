@@ -59,9 +59,14 @@ def post_message(request):
 def get_topics(request):
     user = request.user
     topics = Topic.objects.filter(participants=user).order_by('-created_at') # 自分が参加しているトピック
+    
+    # デバッグ出力
+    print(f"User: {user.username}")
+    print(f"Topics count: {topics.count()}")
+    
     topics_data = [
         {
-            'id': topic.id,
+            'id': topic.topic_id,
             'title': topic.title,
             'description': topic.description,
             'created_by': topic.created_by.username,
@@ -71,6 +76,24 @@ def get_topics(request):
     ]
     return Response(topics_data, status=status.HTTP_200_OK)
 
+
+# 特定の議論データのみを取得
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_topic(request, topic_id):
+    user = request.user
+    try:
+        topic = Topic.objects.get(topic_id=topic_id, participants=user)
+        topic_data = {
+            'id': topic.topic_id,
+            'title': topic.title,
+            'description': topic.description,
+            'created_by': topic.created_by.username,
+            'created_at': topic.created_at.isoformat(),
+        }
+        return Response(topic_data, status=status.HTTP_200_OK)
+    except Topic.DoesNotExist:
+        return Response({"error": "Topic not found"}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -101,26 +124,3 @@ def create_topic(request):
             }, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_topic_detail(request, topic_id):
-    try:
-        topic=Topic.objects.get(id=topic_id)
-
-        # アクセス制御：ユーザーが参加しているか確認
-        if request.user not in topic.participants.all():
-            return Response({'error': 'You do not have access to this topic.'}, status=status.HTTP_403_FORBIDDEN)
-        
-        topic_data = {
-            'id': topic.id,
-            'title': topic.title,
-            'description': topic.description,
-            'created_by': topic.created_by.username,
-            'created_at': topic.created_at.isoformat(),
-            'participants': [user.username for user in topic.participants.all()]
-        }
-        return Response(topic_data, status=status.HTTP_200_OK)
-    except Topic.DoesNotExist:
-        return Response({'error': 'Topic not found.'}, status=status.HTTP_404_NOT_FOUND)

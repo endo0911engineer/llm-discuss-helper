@@ -73,6 +73,16 @@
   background-color: #0097a7;
 }
 
+.redirect {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.link{
+  color: #00bcd4;
+  text-decoration: none;
+}
+
 .error {
   color: #f44336;
   font-size: 0.875rem;

@@ -26,5 +26,9 @@ class Topic(models.Model):
     topic_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     participants = models.ManyToManyField(User, related_name="topics")
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.participants.add(self.created_by)
+
     def __str__(self):
         return self.title

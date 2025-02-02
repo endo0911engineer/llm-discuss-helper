@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import styles from '../style/signup.module.css';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface Errors {
   username?: string;
@@ -119,6 +120,9 @@ export default function SignupPage() {
             </div>
             <button type="submit" className={styles.button}>Register</button>
           </form>
+          <div className={styles.redirect}>
+            <p>Already have an account? <Link href="/login" className={styles.link}>Log In</Link></p>
+          </div>
           </div>
         </main>
     );
