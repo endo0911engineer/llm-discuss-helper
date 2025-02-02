@@ -9,6 +9,7 @@ interface Errors {
   username?: string;
   email?: string;
   password?: string;
+  confirmPassword?: string
   general?: string;
 }
 
@@ -16,6 +17,7 @@ export default function SignupPage() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [errors, setErrors] = useState<Errors>({});
     const router = useRouter();
 
@@ -41,6 +43,13 @@ export default function SignupPage() {
         newErrors.password = 'Password is required.';
       } else if (password.length < 6) {
         newErrors.password = 'Password must be at least 6 characters.';
+      }
+
+      // Confirm Passwordのバリデーション
+      if (!confirmPassword) {
+        newErrors.confirmPassword = 'Please confirm your password.';
+      } else if (password !== confirmPassword) {
+        newErrors.confirmPassword = 'Password do not match.';
       }
 
       setErrors(newErrors);
@@ -118,6 +127,18 @@ export default function SignupPage() {
               />
               {errors.email && <p className={styles.error}>{errors.email}</p>}
             </div>
+            <div className={styles.inputGroup}>
+            <label htmlFor="confirmPassword" className={styles.label}>Confirm Password</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className={`${styles.input} ${errors.email ? styles.inputError : ''}`}
+              required
+            />
+            {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
+          </div>
             <button type="submit" className={styles.button}>Register</button>
           </form>
           <div className={styles.redirect}>

@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import styles from '../style/login.module.css';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 
 export default function SignupPage() {
     const [username, setUsername] = useState('');
@@ -72,9 +71,6 @@ export default function SignupPage() {
             </div>
             <button type="submit" className={styles.button}>LogIn</button>
           </form>
-          <div className={styles.redirect}>
-            <p>Don't have an account? <Link href="/signup" className={styles.link}>Sign Up</Link></p>
-          </div>
           {error && <p className={styles.error}>{error}</p>}
           </div>
         </main>

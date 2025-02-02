@@ -1,14 +1,14 @@
-/* Profile Page */
 .profileContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 100px 20px; /* ヘッダーの高さを考慮 */
+  padding: 100px 20px;
   background-color: #121212;
   min-height: 100vh;
   color: #fff;
 }
 
+/* プロフィールセクション */
 .profileHeader {
   text-align: center;
   margin-bottom: 40px;
@@ -28,53 +28,39 @@
   margin-bottom: 20px;
 }
 
-.uploadAvatar {
-  margin-top: 10px;
-  text-align: center;
-}
-
-.bioSection {
-  margin-top: 20px;
-  width: 100%;
-  max-width: 600px;
-}
-
-.bioInput {
-  width: 100%;
-  background-color: #1e1e1e;
-  color: #fff;
+/* 編集ボタン */
+.editButton {
+  background-color: transparent;
   border: 2px solid #00e6e6;
-  border-radius: 10px;
-  padding: 10px;
-  font-size: 1rem;
-  margin-top: 10px;
-}
-
-.bioInput:focus {
-  outline: none;
-  border-color: #00cccc;
-}
-
-.updateButton {
-  background-color: #00e6e6;
-  color: #121212;
-  border: none;
-  border-radius: 30px;
-  padding: 15px 30px;
+  color: #00e6e6;
+  padding: 10px 20px;
   font-size: 1rem;
   cursor: pointer;
-  margin-top: 20px;
-  display: inline-block;
-  transition: background-color 0.3s, color 0.3s;
+  transition: all 0.3s ease;
 }
 
-.updateButton:hover {
-  background-color: #121212;
-  color: #00e6e6;
-  border: 2px solid #00e6e6;
+.editButton:hover {
+  background-color: #00e6e6;
+  color: #121212;
 }
 
-/* Discussion Section */
+/* ログアウトボタン */
+.logoutButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #e60000;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.logoutButton:hover {
+  background: #cc0000;
+}
+
+/* ディスカッションセクション */
 .discussionSection {
   margin-top: 40px;
   width: 100%;
@@ -83,12 +69,6 @@
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-}
-
-.discussionSection h3 {
-  font-size: 1.8rem;
-  margin-bottom: 20px;
-  color: #00e6e6;
 }
 
 .discussionList {
@@ -101,46 +81,68 @@
   padding: 10px 0;
 }
 
-.discussionItem:last-child {
-  border-bottom: none;
-}
-
-.discussionItem strong {
-  color: #00e6e6;
-}
-
-.discussionItem p {
-  margin: 5px 0;
-  color: #ccc;
-}
-
-.discussionItem span {
-  font-size: 0.9rem;
-  color: #888;
-}
-
-.newDiscussionButton {
-  margin-top: 20px;
-  padding: 15px 30px;
-  font-size: 1.1rem;
-  border-radius: 30px;
-  background-color: #00e6e6;
+.viewDiscussionButton {
+  background: #00e6e6;
+  border: none;
   color: #121212;
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.viewDiscussionButton:hover {
+  background: #0099cc;
+}
+
+/* モーダル */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalContent {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 400px;
+}
+
+.updateButton {
+  background: #00e6e6;
+  padding: 10px;
+  margin-top: 10px;
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
-.newDiscussionButton:hover {
-  background-color: #121212;
-  color: #00e6e6;
+.cancelButton {
+  background: #e60000;
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  cursor: pointer;
+  color: white;
 }
 
-/* Responsive */
+.updateButton:hover {
+  background: #0099cc;
+}
+
+.cancelButton:hover {
+  background: #cc0000;
+}
+
 @media (max-width: 768px) {
-  .bioSection,
-  .discussionSection {
-    max-width: 100%;
+  .modalContent {
+    width: 90%;
   }
 
   .profileHeader h2 {

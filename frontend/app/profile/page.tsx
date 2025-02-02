@@ -27,6 +27,10 @@ export default function ProfilePage () {
     const [bio, setBio] = useState<string>('');
     const [avatar, setAvatar] = useState<File | null>(null);
     const [discussions, setDiscussions] = useState<Discussion[]>([]);
+    const [showEditModal, setShowEditModal] = useState(false);
+
+    const defaultProfile = { username: 'Guest', avatar: '/default-avatar.png', bio: '' };
+    const profileData = userProfile || defaultProfile
 
     useEffect(() => {
         //プロフィール情報取得
@@ -72,9 +76,7 @@ export default function ProfilePage () {
       localStorage.removeItem('access_token');
       window.location.href = '/login';
     }
-
-    
-
+  
     // プロフィール更新
     const handleProfileUpdate = async () => {
         try {
@@ -98,6 +100,7 @@ export default function ProfilePage () {
               const updatedData = await response.json();
               alert('プロフィールが更新されました');
               setUserProfile(updatedData);
+              setShowEditModal(false);
               router.push('/profile');
             } else {
               console.error('Failed to update profile.');
@@ -116,56 +119,40 @@ export default function ProfilePage () {
     };
 
     return (
-        <div className={styles.container}>
-          <button onClick={handleLogout}>ログアウト</button>
+        <div className={styles.profileContainer}>
+          <button className={styles.logoutButton} onClick={handleLogout}>
+            ログアウト
+          </button>
+
           {/* プロフィール情報 */}
-          <div className={styles.profile}>
-            {userProfile && (
-              <>
-                <h2>{userProfile.username}'s Profile</h2>
-                <img
-                  src={userProfile.avatar || '/default-avatar.png'}
-                  alt="User Avatar"
-                  className={styles.avatar}
-                />
-                <div>
-                  <label htmlFor="avatar">アイコン画像をアップロード：</label>
-                  <input
-                  type="file"
-                  id="avatar"
-                  accept="image/*"
-                  onChange={handleAvatarChange}
-                  />
-                </div>
-                <textarea
-                  className={styles.bioInput}
-                  rows={4}
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  placeholder="自己紹介を入力してください..."
-                />
-                <button
-                  className={styles.updateButton}
-                  onClick={handleProfileUpdate}
-                >
-                  Update Profile
-                </button>
-              </>
-            )}
+          <div className={styles.profileHeader}>
+            <h2>{profileData.username}'s Profile</h2>
+            <img
+            src={profileData.avatar}
+            alt="User Avatar"
+            className={styles.profileAvatar}
+            />
+            <button className={styles.editButton} onClick={() => setShowEditModal(true)}>
+              プロフィールを編集
+            </button>
           </div>
-          <div className={styles.discussions}>
+
+          {/* ディスカッション履歴 */}
+          <div className={styles.discussionSection}>
             <h3>過去のディスカッション履歴</h3>
             {discussions.length > 0 ? (
-              <ul>
+              <ul className={styles.discussionList}>
                 {discussions.map((discussion) => (
-                  <li key={discussion.id}>
+                  <li key={discussion.id} className={styles.discussionItem}>
                     <strong>トピック：</strong> {discussion.title}
                     <br />
                     <strong>概要：</strong> {discussion.description}
                     <br />
                     <strong>日時：</strong> {new Date(discussion.created_by).toLocaleString()}
                     <br />
-                    <button onClick={() => router.push(`/discussion/${discussion.id}`)}>
+                    <button 
+                    className={styles.viewDiscussionButton}
+                    onClick={() => router.push(`/discussion/${discussion.id}`)}>
                       ディスカッションに移動
                     </button>
                   </li>
@@ -178,6 +165,41 @@ export default function ProfilePage () {
               新しいディスカッションを作る
             </button>
           </div>
+
+          {/* 編集モーダル */}
+          {showEditModal && (
+            <div className={styles.modalOverlay}>
+              <div className={styles.modalContent}>
+                <h2>プロフィール編集</h2>
+                <label htmlFor="avatar">アイコン画像をアップロード：</label>
+                <input
+                type="file"
+                id="avatar"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                />
+                <textarea
+                className={styles.bioInput}
+                rows={4}
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="自己紹介を入力してください..."
+                />
+                <button
+                  className={styles.updateButton}
+                  onClick={handleProfileUpdate}
+                >
+                  Update Profile
+                </button>
+                <button 
+                  className={styles.cancelButton} 
+                  onClick={() => setShowEditModal(false)}
+                >
+                  キャンセル
+                </button>
+              </div>
+            </div>
+          )}
         </div>
     );
 }
