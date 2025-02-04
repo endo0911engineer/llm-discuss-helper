@@ -98,6 +98,7 @@ export default function ProfilePage () {
 
             if (response.ok) {
               const updatedData = await response.json();
+              console.log(updatedData);
               alert('プロフィールが更新されました');
               setUserProfile(updatedData);
               setShowEditModal(false);

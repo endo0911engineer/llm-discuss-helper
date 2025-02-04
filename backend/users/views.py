@@ -7,11 +7,13 @@ from django.contrib.auth import authenticate
 from rest_framework import status
 from django.contrib.auth.models import User
 from chat.models import Topic
+from .models import Profile
 from .serializers import UserSerializer
 from .serializers import ProfileSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
+import json
 
 class RegisterAPIView(APIView):
     def post(self, request):
@@ -38,34 +40,26 @@ class ProfileAPIView(APIView):
 
     
     def put(self, request):
-        print(request.data)  # 受信したデータを出力
+        # QueryDictを普通の辞書形式に変換
+        request_data = {key: value[0] if isinstance(value, list) else value for key, value in request.data.items()}
+        print("Converted request_data:", request_data)
 
-        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        # `profile` 内にネストされていないので、直接取得する
+        profile_data = {
+            "bio": request.data.get("bio", None),
+            "avatar": request.data.get("avatar", None),
+        }
+        print("Extracted profile_data:", profile_data)
+
+        # ユーザー情報の更新（`profile` はここで直接渡す）
+        serializer = UserSerializer(request.user, data={"profile": profile_data}, partial=True)
         if serializer.is_valid():
             serializer.save()
             print("Updated user profile:", serializer.data)
             return Response(serializer.data)
+        
         print("Serializer errors:", serializer.errors)  # バリデーションエラーを出力
         return Response(serializer.errors, status=400)
-    
-    def update(self, instance, validated_data):
-        # プロフィールデータを分離
-        profile_data = validated_data.pop('profile', {})
-
-        # ユーザー情報の更新
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-
-        # プロフィールの更新または作成
-        profile = instance.profile if hasattr(instance, 'profile') else Profile(user=instance)
-        profile_serializer = ProfileSerializer(profile, data=profile_data, partial=True)
-        if profile_serializer.is_valid():
-            profile_serializer.save()
-        else:
-            print("ProfileSerializer errors:", profile_serializer.errors)  # デバッグ用
-
-        return instance
 
 
 class LoginAPIView(APIView):
@@ -90,20 +84,6 @@ class LoginAPIView(APIView):
             # 認証失敗の場合
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
         
-
-
-@api_view(['GET'])
-def get_followers(request):
-    user = request.user
-    followers = user.followers.all()
-    followers_data = [
-        {
-            "id": follower.follower.id,
-            "username": follower.follower.username,
-        }
-        for follower in followers
-    ]
-    return Response({"followers": followers_data}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
