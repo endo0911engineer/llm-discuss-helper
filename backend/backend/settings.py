@@ -1,10 +1,13 @@
 from pathlib import Path
 from datetime import timedelta
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+# メディアファイルの設定
+MEDIA_URL = '/media/'  # メディアファイルへのアクセスURL
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -144,9 +147,6 @@ CORS_ALLOWED_ORIGINS = [
 
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],  # Redisのホスト設定
-        },
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }

@@ -5,11 +5,13 @@ import { useEffect, useState } from "react";
 import styles from '../style/profile.module.css';
 
 interface UserProfile{
+  id: number,
   username: string,
   email: string,
-  bio: string,
-  avatar: string,
-  images: string[];
+  profile: {
+    bio: string | null;
+    avatar: string | null;
+  }
 }
 
 interface Discussion {
@@ -128,11 +130,16 @@ export default function ProfilePage () {
           {/* プロフィール情報 */}
           <div className={styles.profileHeader}>
             <h2>{profileData.username}'s Profile</h2>
-            <img
-            src={profileData.avatar}
-            alt="User Avatar"
-            className={styles.profileAvatar}
-            />
+            {userProfile?.profile?.avatar ? (
+              <img
+              src={`http://127.0.0.1:8000${userProfile.profile.avatar}`}
+              alt="User Avatar"
+              className={styles.profileAvatar}
+              />
+            ) : (
+            <p>No avatar available</p>
+            )}
+            <p>{userProfile?.profile?.bio || ""}</p>
             <button className={styles.editButton} onClick={() => setShowEditModal(true)}>
               プロフィールを編集
             </button>

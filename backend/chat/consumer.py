@@ -1,6 +1,11 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import Message
+from django.contrib.auth import get_user_model
+from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
+
+User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -28,8 +33,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message_text = text_data_json['message']
 
+        user = self.scope['user']
+
         # メッセージを保存
-        message = Message.objects.create(user=self.scope['user'], text=message_text)
+        message = await database_sync_to_async(Message.objects.create)(user=user, text=message_text)
 
         # グループ内の全員にメッセージを送信
         await self.channel_layer.group_send(
@@ -37,7 +44,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {
                 'type': 'chat_message',
                 'message': message.text,
-                'user': self.scope['user'].username,
+                'user': user.username,
             }
         )
     

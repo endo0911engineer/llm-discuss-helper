@@ -28,7 +28,7 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
     useEffect(() => {
       const protocol = window.location.protocol === "https:" ? "wss" : "ws";
       const chatSocket = new WebSocket(
-        `http://127.0.0.1:8000/ws/chat/${id}/`
+        `${protocol}://127.0.0.1:8000/ws/chat/${id}/`
       );
 
       chatSocket.onopen = () => {
