@@ -169,9 +169,12 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
             <p>Loading...</p>
           )}
         </div>
-        <div className={styles.messageList}>
+        <div className={styles.messageContainer}>
           {messages.map((msg) => (
-            <div key={msg.id} className={styles.messageItem}>
+            <div 
+            key={msg.id} 
+            className={`${styles.messageItem} ${msg.user === user ? styles.messageRight : styles.messageLeft}`}
+            >
               <img
                 src={msg.user_icon}
                 alt={`${msg.user}のアイコン`}
@@ -190,6 +193,7 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
 
       {/* メッセージ送信 */}
       <div className={styles.section}>
+        <div className={styles.inputWrapper}>
         <textarea
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
@@ -205,6 +209,7 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
         >
           {loading ? '送信中...' : '送信'}
         </button>
+        </div>
       </div>
     </div>
     );

@@ -37,6 +37,7 @@
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  margin-top: 20px;
 }
 
 .editButton:hover {
@@ -69,11 +70,25 @@
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.discussionSection h3 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #00e6e6;
+  margin-bottom: 20px;
+  align-self: center;
+  text-align: center;
 }
 
 .discussionList {
   list-style: none;
   padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .discussionItem {
@@ -88,9 +103,28 @@
   padding: 10px;
   cursor: pointer;
   transition: background 0.3s;
+  margin-top: 10px;
+  align-self: flex-start;
 }
 
 .viewDiscussionButton:hover {
+  background: #0099cc;
+}
+
+.newDiscussionButton {
+  background: #00e6e6;
+  color: #121212;
+  padding: 10px 20px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 20px;
+  align-self: center;
+  text-align: center;
+}
+
+.newDiscussionButton:hover {
   background: #0099cc;
 }
 
@@ -109,26 +143,40 @@
 
 .modalContent {
   background: #1e1e1e;
-  padding: 20px;
+  padding: 30px;
   border-radius: 10px;
   text-align: center;
   width: 400px;
+  max-width: 90%;
+}
+
+.bioInput {
+  width: 100%;  
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #333;
+  border: 1px solid #00e6e6;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 1rem;
+  resize: vertical;
+}
+
+.updateButton, .cancelButton {
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  font-size: 1.1rem;
 }
 
 .updateButton {
   background: #00e6e6;
-  padding: 10px;
-  margin-top: 10px;
-  border: none;
-  cursor: pointer;
 }
 
 .cancelButton {
   background: #e60000;
-  padding: 10px;
-  margin-top: 10px;
-  border: none;
-  cursor: pointer;
   color: white;
 }
 
@@ -143,9 +191,23 @@
 @media (max-width: 768px) {
   .modalContent {
     width: 90%;
+    padding: 20px;
   }
 
   .profileHeader h2 {
     font-size: 2rem;
+  }
+
+  .profileAvatar {
+    width: 120px;
+    height: 120px;
+  }
+
+  .editButton {
+    font-size: 0.9rem;
+  }
+
+  .logoutButton {
+    padding: 8px 16px;
   }
 }

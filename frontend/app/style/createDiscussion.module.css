@@ -55,3 +55,45 @@
     background-color: #121212;
     color: #00e6e6;
   }
+
+  .inviteLink {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.inviteLink p {
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* リンク入力フィールド */
+.linkInput {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background-color: #222;
+    color: #fff;
+}
+
+/* コピーするボタン */
+.inviteLink button {
+    background: #00e6e6;
+    color: #121212;
+    padding: 10px 20px;
+    margin: 5px 0;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-radius: 5px;
+}
+
+/* コピーするボタンのホバー効果 */
+.inviteLink button:hover {
+    background-color: #121212;
+    color: #00e6e6;
+}
