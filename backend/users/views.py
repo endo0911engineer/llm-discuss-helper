@@ -44,7 +44,7 @@ class ProfileAPIView(APIView):
         request_data = {key: value[0] if isinstance(value, list) else value for key, value in request.data.items()}
         print("Converted request_data:", request_data)
 
-        # `profile` 内にネストされていないので、直接取得する
+        # `profile` がない場合は新しく作成
         profile_data = {
             "bio": request.data.get("bio", None),
             "avatar": request.data.get("avatar", None),
@@ -59,6 +59,28 @@ class ProfileAPIView(APIView):
             return Response(serializer.data)
         
         print("Serializer errors:", serializer.errors)  # バリデーションエラーを出力
+        return Response(serializer.errors, status=400)
+    
+    def patch(self, request):
+        # リクエストデータを取得し、リスト形式を通常の値に変換
+        request_data = {key: value[0] if isinstance(value, list) else value for key, value in request.data.items()}
+        print("Converted request_data:", request_data)
+
+        profile_data = {}
+        
+        if "bio" in request_data:
+            profile_data["bio"] = request_data["bio"]
+        if "avatar" in request_data:
+            profile_data["avatar"] = request_data["avatar"]
+
+        # `partial=True` を指定し、変更のあるデータのみ更新
+        serializer = UserSerializer(request.user, data={"profile": profile_data}, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            print("Updated user profile:", serializer.data)
+            return Response(serializer.data)
+
+        print("Serializer errors:", serializer.errors)
         return Response(serializer.errors, status=400)
 
 

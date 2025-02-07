@@ -16,10 +16,10 @@ class UserSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         print(f"validated_data: {validated_data}")  # デバッグ用
-        profile_data = validated_data.pop('profile', None)
+        profile_data = validated_data.pop('profile', {})
 
-        if profile_data:
-            profile, created = Profile.objects.get_or_create(user=instance)
+        profile = getattr(instance, 'profile', None)
+        if profile and profile_data:
             profile_serializer = ProfileSerializer(profile, data=profile_data, partial=True)
             if profile_serializer.is_valid():
                 profile_serializer.save()

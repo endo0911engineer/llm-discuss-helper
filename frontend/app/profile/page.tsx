@@ -83,15 +83,22 @@ export default function ProfilePage () {
     const handleProfileUpdate = async () => {
         try {
             const formData = new FormData();
-            formData.append('bio', bio);
+            const isNewProfile = !userProfile;
+
+            if (bio !== userProfile?.profile.bio) {
+              formData.append("bio", bio);
+            }
+
             if(avatar) {
                 formData.append('avatar', avatar);
             }
 
             console.log('FormData:', formData.get('bio'), formData.get('avatar'))
 
+            const method = isNewProfile ? "PUT" : "PATCH";
+
             const response = await fetch('http://127.0.0.1:8000/api/profile/', {
-                method: 'PUT',
+                method: method,
                 body: formData,
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('access_token')}`,
