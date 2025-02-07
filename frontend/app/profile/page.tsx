@@ -188,7 +188,7 @@ export default function ProfilePage () {
                     <br />
                     <strong>概要：</strong> {discussion.description}
                     <br />
-                    <strong>日時：</strong> {new Date(discussion.created_by).toLocaleString()}
+                    <strong>作成者：</strong> {discussion.created_by}
                     <br />
                     <button 
                     className={styles.viewDiscussionButton}
