@@ -121,6 +121,31 @@ export default function ProfilePage () {
       }
     };
 
+
+    // ディスカッションの削除
+    const handleDelete = async (discussionId:string) => {
+      if (window.confirm('このディスカッションを削除しますか？')) {
+        try {
+          const response = await fetch(`http://127.0.0.1:8000/api/delete_topic/${discussionId}/`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            },
+          });
+
+          if (response.ok) {
+            alert('ディスカッションを削除しました');
+            setDiscussions((prevDiscussions) => prevDiscussions.filter(d => d.id !== discussionId));
+          } else {
+            alert('削除に失敗しました。');
+          }
+        } catch(error) {
+          console.log('削除エラー:', error);
+          alert('削除中にエラーが発生しました');
+        }
+      }
+    };
+
     return (
         <div className={styles.profileContainer}>
           <button className={styles.logoutButton} onClick={handleLogout}>
@@ -162,6 +187,12 @@ export default function ProfilePage () {
                     className={styles.viewDiscussionButton}
                     onClick={() => router.push(`/discussion/${discussion.id}`)}>
                       ディスカッションに移動
+                    </button>
+                    <button 
+                    className={styles.deleteDiscussionButton}
+                    onClick={() => handleDelete(discussion.id)}
+                    >
+                      削除
                     </button>
                   </li>
                 ))}

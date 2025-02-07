@@ -96,6 +96,30 @@
   padding: 10px 0;
 }
 
+.deleteDiscussionButton {
+  background: #e60000;
+  color: white;
+  border: none;
+  padding: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  margin-top: 10px;
+  align-self: flex-start;
+  border-radius: 5px;
+  margin-left: 20px;
+}
+
+.deleteDiscussionButton:hover {
+  background: #cc0000;
+  transform: scale(1.05);
+}
+
+.deleteDiscussionButton:active {
+  background: #a00000;
+  transform: scale(0.95);
+}
+
 .viewDiscussionButton {
   background: #00e6e6;
   border: none;

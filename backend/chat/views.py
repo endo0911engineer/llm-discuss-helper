@@ -5,7 +5,7 @@ from rest_framework import status
 from .models import Message
 from transformers import pipeline
 from .models import Topic
-from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 import uuid
 
 # 要約用のパイプライン作成
@@ -124,3 +124,16 @@ def create_topic(request):
             }, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_topic(request, topic_id):
+    topic = get_object_or_404(Topic, topic_id=topic_id)
+
+    # ユーザーが作成者が確認
+    if topic.created_by != request.user:
+        return Response({'error': 'You do not have permission to delete this topic'}, status=status.HTTP_403_FORBIDDEN)
+    
+    topic.delete()
+    return Response({'message': 'Topic deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
