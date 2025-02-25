@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    command: gunicorn project_name.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - sqlite_data:/app/db  # SQLiteファイルの永続化
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    environment:
+      - DEBUG=1
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - REDIS_URL=redis://redis:6379
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+  
+volumes:
+  sqlite_data:
