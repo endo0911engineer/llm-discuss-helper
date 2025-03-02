@@ -39,19 +39,18 @@ def message_list(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated]) 
 def post_message(request):
-    if request.method == 'POST':
-        message_text = request.POST.get('message')
+    message_text = request.data.get('message')
 
-        if not message_text:
-            return Response({'error': 'Message text is required.'}, status=status.HTTP_400_BAD_REQUEST)
+    if not message_text:
+        return Response({'error': 'Message text is required.'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # メッセージを保存
-        message = Message.objects.create(user=request.user, text=message_text)
+    # メッセージを保存
+    message = Message.objects.create(user=request.user, text=message_text)
         
-        return Response({
-            'message': 'Message created successfully!',
-            'message_id': message.id
-        }, status=status.HTTP_201_CREATED) 
+    return Response({
+        'message': 'Message created successfully!',
+        'message_id': message.id
+    }, status=status.HTTP_201_CREATED) 
     
 
 @api_view(['GET'])
