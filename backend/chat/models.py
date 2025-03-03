@@ -1,22 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
-from django.conf import settings
 import uuid
-
-class Message(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    text = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "user": self.user.username,
-            "user_icon": self.user.profile.icon_url, 
-            "text": self.text,
-            "created_at": self.created_at.isoformat(),
-        }
-
+from django.contrib.auth.models import User
 
 class Topic(models.Model):
     title = models.CharField(max_length=255)  
@@ -32,3 +16,18 @@ class Topic(models.Model):
 
     def __str__(self):
         return self.title
+
+class Message(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, to_field="topic_id")  # 修正点
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user": self.user.username,
+            "user_icon": self.user.profile.icon_url, 
+            "text": self.text,
+            "created_at": self.created_at.isoformat(),
+        }

@@ -2,38 +2,60 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Message
+from .models import Message, Topic
 from transformers import pipeline
-from .models import Topic
 from django.shortcuts import get_object_or_404
 import uuid
 
 # 要約用のパイプライン作成
 summarizer = pipeline("summarization")
 
-def summarize_text(text):
-    summary = summarizer(text, max_length=150, min_length=50, do_sample=False)
-    return summary[0]['summary_text']
-
 @api_view(['GET'])
-def message_list(request):
-    messages = Message.objects.all().order_by('-created_at') # メッセージを新しい順に取得
+@permission_classes([IsAuthenticated]) 
+def summarize_messages(request):
+    # 指定されたtopic_idのメッセージを要約する。
+    topic_id = request.query_params.get('topic_id')
+    if not topic_id:
+        return Response({'error': 'topic_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    topic = get_object_or_404(Topic, topic_id=topic_id)
+    messages = Message.objects.filter(topic=topic).order_by('-created_at')
 
-    # メッセージのテキストをまとめて要約
+    # メッセージのテキストをまとめて要約する。
     message_texts = "\n".join([msg.text for msg in messages])
-    summary = summarize_text(message_texts) if message_texts else "まだメッセージはありません。"
+    if not message_texts:
+        summary = "まだメッセージはありません。"
+    else:
+        summary_result = summarizer(message_texts, max_length=150, min_length=50, do_sample=False)
+        summary = summary_result[0]['summary_text']
 
     return Response({
-                'summary': summary,
-                'message': [
-                    {
-                        'id': msg.id,
-                        'user': msg.user.username,
-                        'text': msg.text,
-                        'created_at': msg.created_at,
-                    }
-                    for msg in messages
-                ]
+        'topic': topic.title,
+        'summary': summary
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated]) 
+def message_list(request):
+    topic_id = request.query_params.get('topic_id')
+    if not topic_id:
+        return Response({'error': 'topic_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    topic = get_object_or_404(Topic, topic_id=topic_id)
+    messages = Message.objects.filter(topic=topic).order_by('-created_at')
+
+    return Response({
+        'topic': topic.title,
+        'message': [
+            {
+                'id': msg.id,
+                'user': msg.user.username,
+                'text': msg.text,
+                'created_at': msg.created_at,
+            }
+            for msg in messages
+        ]
     }, status=status.HTTP_200_OK)
 
 @api_view(['POST'])

@@ -153,6 +153,31 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
         setLoading(false);
     }
 
+    // 議論を要約するリクエスト
+    const handleSummarizeDiscussion = async () => {
+      setLoading(true);
+
+      try {
+        const res = await fetch(`http://localhost:8000/api/summary/${id}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch summary");
+        }
+
+        const data = await res.json();
+        setSummary(data.summary);
+      } catch (error) {
+        console.error('Error fetching summary:', error)
+      }
+
+      setLoading(false);
+    }
+
     return (
       <div className={styles.container}>
       <h1 className={styles.heading}>議論ページ</h1>
@@ -212,6 +237,18 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
         </button>
         </div>
       </div>
+
+      {/* 議論要約 */}
+      <button onClick={handleSummarizeDiscussion} disabled={loading}>
+        {loading ? "Summarizing..." : "Summarize Discussion"}
+      </button>
+
+      {summary && (
+        <div>
+          <h2>Summary</h2>
+          <p>{summary}</p>
+        </div>
+      )}
     </div>
     );
 }
