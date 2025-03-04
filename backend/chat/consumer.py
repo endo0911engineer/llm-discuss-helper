@@ -4,7 +4,6 @@ from .models import Message
 from django.contrib.auth import get_user_model
 from channels.generic.websocket import AsyncWebsocketConsumer
 from rest_framework_simplejwt.tokens import AccessToken
-from channels.db import database_sync_to_async
 from asgiref.sync import sync_to_async
 from django.contrib.auth.models import AnonymousUser
 
@@ -12,78 +11,119 @@ User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        print(f"URL route kwargs: {self.scope['url_route']['kwargs']}")
+        print("WebSocket接続開始")
 
-        self.scope["user"] = AnonymousUser() # デフォルトは匿名ユーザー
-
-        # クエリパラメータからtokenを取得
-        query_string = self.scope["query_string"].decode()
-        token_param = dict(q.split("=") for q in query_string.split("&") if "=" in q).get("token", None)
-
-        # トークンの検証
-        if token_param:
-            try:
-                access_token = AccessToken(token_param)
-                user = await sync_to_async(User.objects.get)(id=access_token["user_id"])
-                self.scope["user"] = user
-            except Exception as e:
-                print(f"Token validation error: {e}") # デバッグ用ログ
-                await self.close()
-                return 
-        
-        # 認証に成功した場合のみ接続を受け入れる
-        if not self.scope["user"].is_authenticated:
-            await self.close(code=4002)
+        # ルーム名の取得
+        self.room_name = self.scope["url_route"]["kwargs"].get("room_name")
+        if not self.room_name:
+            print("エラー: ルーム名が取得できませんでした")
+            await self.close()
             return
 
-        await self.accept()
+        try:
+            await self.accept()
+            self.authenticated = False
+            print(f"WebSocket接続成功: ルーム {self.room_name}")
+        except Exception as e:
+            print(f"WebSocketエラー: {e}")
 
-        # チャットルームの設定
-        self.room_name = self.scope['url_route']['kwargs']['room_name'] # チャットルーム名
-        self.room_group_name = f'chat_{self.room_name}' # チャットグループ名
+    async def receive(self, text_data):
+        print(f"受信データ: {text_data}")  # 受信データをログに出力
 
-        print(f"URL route kwargs: {self.scope['url_route']['kwargs']}")
+        try:
+            data = json.loads(text_data)
+            if data.get("type") == "ping":
+                print("Ping received")  # デバッグ
+                await self.send(json.dumps({"type": "pong"}))
+            print(f"受信データ（after parsing）: {data}")  # 追加
+        except json.JSONDecodeError:
+            print("エラー: JSONのデコードに失敗")
+            await self.send(json.dumps({"type": "error", "message": "Invalid JSON"}))
+            return
 
-        # グループに参加
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
+        # 認証処理
+        if data.get("type") == "authenticate":
+            token = data.get("token")
+            print(f"認証トークン受信: {token}")  # 追加
+
+            if token:
+                user = await self.get_user_from_token(token)
+                if user:
+                    self.scope["user"] = user
+                    self.authenticated = True
+                    print(f"認証成功: {user.username}")
+                    await self.send(json.dumps({"type": "authentication_success"}))
+                    return
+            
+            print("認証失敗")
+            await self.send(json.dumps({"type": "authentication_failed"}))
+            await self.close()
+            return
+        
+        print(f"認証済みか: {self.authenticated}")  # 追加
+        # 認証されていない場合はメッセージを拒否
+        if not self.authenticated:
+            print("エラー: 認証されていないユーザーがメッセージを送信しようとしました")
+            await self.send(json.dumps({"type": "authentication_failed"}))
+            await self.close()
+            return
+
+        message_text = data.get("message", "").strip()
+        print(f"受信メッセージ: {message_text}")  # 追加
+
+        if not message_text:
+            print("エラー: 空のメッセージが送信されました")
+            return
+
+        user = self.scope["user"]
+
+        try:
+            # メッセージを保存
+            message = await sync_to_async(Message.objects.create)(user=user, text=message_text)
+            print(f"メッセージ保存成功: {message.text} (from {user.username})")
+
+            # グループ内の全員にメッセージを送信
+            await self.channel_layer.group_send(
+                f'chat_{self.room_name}',
+                {
+                    'type': 'chat_message',
+                    'message': message.text,
+                    'user': user.username,
+                }
+            )
+        except Exception as e:
+            print(f"メッセージ保存エラー: {e}")
+            await self.send(json.dumps({"type": "error", "message": "Message save failed"}))
+
+    async def chat_message(self, event):
+        print(f"送信メッセージ: {event}")  # 送信するデータをログに出力
+        await self.send(text_data=json.dumps({
+            'message': event['message'],
+            'user': event['user'],
+        }))
 
     async def disconnect(self, close_code):
+        print(f"WebSocket切断: {close_code}")
+
+        if not self.room_name:
+            print("切断時にルーム名が取得できませんでした")
+            return
+
         # グループから切断
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
+        try:
+            await self.channel_layer.group_discard(
+                f'chat_{self.room_name}',
+                self.channel_name
+            )
+            print(f"グループ `{self.room_name}` から切断")
+        except Exception as e:
+            print(f"disconnect エラー: {e}")
 
-    
-    # 他のユーザーからメッセージを受け取って送信
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message_text = text_data_json['message']
-
-        user = await database_sync_to_async(User.objects.get)(id=self.scope["user"].id)
-
-        # メッセージを保存
-        message = await database_sync_to_async(Message.objects.create)(user=user, text=message_text)
-
-        # グループ内の全員にメッセージを送信
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message.text,
-                'user': user.username,
-            }
-        )
-    
-    # メッセージをWebsocketで送信
-    async def chat_message(self, event):
-        message = event['message']
-        user = event['user']
-
-        await self.send(text_data=json.dumps({
-            'message': message,
-            'user': user
-        }))
+    @sync_to_async
+    def get_user_from_token(self, token):
+        try:
+            access_token = AccessToken(token)
+            return User.objects.get(id=access_token["user_id"])
+        except Exception as e:
+            print(f"認証エラー: {e}")
+            return None

@@ -28,12 +28,19 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
     useEffect(() => {
       const protocol = window.location.protocol === "https:" ? "wss" : "ws";
       const chatSocket = new WebSocket(
-        `${protocol}://127.0.0.1:8000/ws/chat/${id}/?token=${localStorage.getItem('access_token')}`
+        `${protocol}://127.0.0.1:8000/ws/chat/${id}/`
       );
-      console.log("WebSocket URL:", `${protocol}://127.0.0.1:8000/ws/chat/${id}/?token=${localStorage.getItem('access_token')}`);
 
       chatSocket.onopen = () => {
         console.log("Websocket connection established");
+
+        // Websocket接続時に最初のメッセージでトークンを送信
+        chatSocket.send(
+          JSON.stringify({
+            type: "authenticate",
+            token: localStorage.getItem("access_token"),
+          })
+        );
       };
 
       chatSocket.onerror = (error) => {
@@ -42,19 +49,27 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
 
       chatSocket.onmessage = (e) => {
         const data = JSON.parse(e.data);
-        setMessages((prev) => [
-          ...prev,
-          { id: Date.now(), 
-            user: data.user, 
-            text: data.message, 
-            created_at: new Date().toISOString(),
-            user_icon: data.user_icon || "/default-icon.png" 
-          }
-        ]);
+        if (data.type === "authentication_success") {
+          console.log("Authentication successful!");
+        } else if (data.type === "authentication_failed") {
+          console.error("Authentication failed!");
+          chatSocket.close();
+        } else {
+          setMessages((prev) => [
+            ...prev,
+            { 
+              id: Date.now(), 
+              user: data.user, 
+              text: data.message, 
+              created_at: new Date().toISOString(),
+              user_icon: data.user_icon || "/default-icon.png" 
+            },
+          ]);
+        }
       };
 
-      chatSocket.onclose = () => {
-        console.error('Chat socket closed unexpectedly');
+      chatSocket.onclose = (event) => {
+        console.error(`Chat socket closed unexpectedly. Code: ${event.code}, Reason: ${event.reason}`);
       };
 
       setSocket(chatSocket);
