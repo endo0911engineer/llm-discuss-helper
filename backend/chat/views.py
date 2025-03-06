@@ -62,13 +62,21 @@ def message_list(request):
 @permission_classes([IsAuthenticated]) 
 def post_message(request):
     message_text = request.data.get('message')
+    topic_id = request.data.get('topic_id')
+
+    print(f"Received topic_id: {topic_id}")
 
     if not message_text:
         return Response({'error': 'Message text is required.'}, status=status.HTTP_400_BAD_REQUEST)
         
+    try:
+        topic = Topic.objects.get(topic_id=uuid.UUID(topic_id))
+    except Topic.DoesNotExist:
+        return Response({'error': 'Invalid topic_id. Topic not found.'}, status=status.HTTP_404_NOT_FOUND)
+    
     # メッセージを保存
-    message = Message.objects.create(user=request.user, text=message_text)
-        
+    message = Message.objects.create(user=request.user, text=message_text, topic=topic)
+
     return Response({
         'message': 'Message created successfully!',
         'message_id': message.id
@@ -126,7 +134,7 @@ def create_topic(request):
         return Response({'error': 'Title and description are required.'}, status=status.HTTP_400_BAD_REQUEST)
     
     # 一意のIDを作成
-    topic_id = str(uuid.uuid4())
+    topic_id = uuid.uuid4()
     # ログインユーザーを取得
     user = request.user
 

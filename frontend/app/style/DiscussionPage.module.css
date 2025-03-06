@@ -1,145 +1,139 @@
 .container {
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
-  font-family: Arial, sans-serif;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 100vh;
+  height: 100vh; /* 画面いっぱいの高さ */
+  background-color: #000; /* 背景を黒に */
+  color: #fff; /* テキスト色を白に */
+  padding: 20px;
 }
 
 .heading {
   text-align: center;
-  font-size: 24px;
+  color: #fff; /* テキスト色を白に */
   margin-bottom: 20px;
 }
 
 .section {
-  margin-bottom: 20px;
-}
-
-.input,
-.textarea {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-
-.button {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-.button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+  flex: 1; /* セクションを伸縮可能に */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .messageContainer {
-  flex-grow: 1;
+  flex: 1; /* メッセージコンテナを伸縮可能に */
   display: flex;
   flex-direction: column;
-  background-color: #f0f0f0; /* メッセージエリアの背景色 */
-  border-radius: 10px;
+  gap: 10px;
+  overflow-y: auto;
   padding: 10px;
-  overflow-y: auto; /* メッセージが増えたらスクロール */
-  min-height: 0; /* Flexbox でスクロール可能にする */
+  background-color: #1e1e1e; /* メッセージコンテナの背景を暗いグレーに */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-height: 60vh; /* メッセージがない場合の最小高さ */
 }
 
 .messageItem {
   display: flex;
-  align-items: center;
-  margin-bottom: 10px;
+  align-items: flex-start;
+  gap: 10px;
   padding: 10px;
-  border-radius: 10px;
-  background-color: #f4f4f4;
-  max-width: 80%;
-}
-
-.messageRight {
-  align-self: flex-end;
-  background: #007bff;
-  color: white;
-  padding: 10px;
-  border-radius: 10px;
+  border-radius: 8px;
+  max-width: 70%;
 }
 
 .messageLeft {
   align-self: flex-start;
-  background: #f1f1f1;
-  color: black;
-  padding: 10px;
-  border-radius: 10px;
+  background-color: #333; /* 他ユーザーのメッセージ背景を暗いグレーに */
+  color: #fff; /* テキスト色を白に */
+}
+
+.messageRight {
+  align-self: flex-end;
+  background-color: #007bff; /* 自分のメッセージ背景を青に */
+  color: #fff; /* テキスト色を白に */
 }
 
 .messageIcon {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  margin-right: 10px;
 }
 
 .messageUser {
   font-weight: bold;
-  margin-right: 5px;
 }
 
 .messageText {
-  display: inline-block;
   margin-top: 5px;
 }
 
 .messageDate {
-  font-size: 12px;
-  color: gray;
-  margin-top: 5px;
+  font-size: 0.8em;
+  color: #aaa; /* 日付の色を薄いグレーに */
 }
 
 .inputWrapper {
   display: flex;
-  justify-content: space-between;
-}
-
-.inputArea {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  max-width: 800px;
-  background: white;
-  padding: 10px;
-  display: flex;
   gap: 10px;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  align-items: flex-end;
 }
 
 .textarea {
-  width: 80%;
+  flex: 1;
   padding: 10px;
-  margin-bottom: 10px;
-  font-size: 16px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  background-color: #f9f9f9;
+  border: 1px solid #444; /* テキストエリアのボーダーを暗いグレーに */
+  border-radius: 8px;
   resize: none;
+  font-size: 1em;
+  background-color: #1e1e1e; /* テキストエリアの背景を暗いグレーに */
+  color: #fff; /* テキスト色を白に */
 }
 
 .button {
   padding: 10px 20px;
-  font-size: 16px;
-  background-color: #007bff;
-  color: white;
+  background-color: #007bff; /* ボタンの背景を青に */
+  color: #fff; /* テキスト色を白に */
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 1em;
 }
 
 .button:disabled {
-  background-color: #ccc;
+  background-color: #555; /* 無効時のボタン背景を暗いグレーに */
   cursor: not-allowed;
+}
+
+.summaryButton {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #28a745; /* 要約ボタンの背景を緑に */
+  color: #fff; /* テキスト色を白に */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.summaryButton:disabled {
+  background-color: #555; /* 無効時のボタン背景を暗いグレーに */
+  cursor: not-allowed;
+}
+
+.summarySection {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #1e1e1e; /* 要約セクションの背景を暗いグレーに */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.summarySection h2 {
+  margin-bottom: 10px;
+  color: #fff; /* テキスト色を白に */
+}
+
+.summarySection p {
+  color: #aaa; /* 要約テキストの色を薄いグレーに */
 }

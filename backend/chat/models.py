@@ -9,6 +9,7 @@ class Topic(models.Model):
     created_at = models.DateTimeField(auto_now_add=True) 
     topic_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     participants = models.ManyToManyField(User, related_name="topics")
+    is_summarized = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -19,7 +20,7 @@ class Topic(models.Model):
 
 class Message(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, to_field="topic_id")  # 修正点
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, to_field="topic_id") 
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 

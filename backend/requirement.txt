@@ -2,5 +2,10 @@ Django
 djangorestframework
 djangorestframework-simplejwt
 transformers
+tensorflow
 gunicorn
 redis
+daphne
+channels
+django-cors-headers
+tf-keras

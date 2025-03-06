@@ -16,10 +16,12 @@ from rest_framework.decorators import api_view
 import json
 
 class RegisterAPIView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         username = request.data.get('username')
-        password = request.data.get('password')
         email = request.data.get('email')
+        password = request.data.get('password')
 
         if User.objects.filter(username=username).exists():
             return Response({'error': 'Username already exists'}, status=400)

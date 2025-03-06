@@ -30,7 +30,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app',
     'rest_framework',
     'users',
     'chat',
@@ -153,12 +152,12 @@ CHANNEL_LAYERS = {
 
 # WebSocketに許可設定
 CORS_ALLOW_CREDENTIALS = True
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
         'console': {
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
         },
     },
@@ -166,12 +165,6 @@ LOGGING = {
         'django': {
             'handlers': ['console'],
             'level': 'INFO',
-            'propagate': True,
-        },
-        'django.channels': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
         },
     },
 }

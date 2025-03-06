@@ -30,7 +30,7 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
       const chatSocket = new WebSocket(
         `${protocol}://127.0.0.1:8000/ws/chat/${id}/`
       );
-
+      
       chatSocket.onopen = () => {
         console.log("Websocket connection established");
 
@@ -70,6 +70,9 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
 
       chatSocket.onclose = (event) => {
         console.error(`Chat socket closed unexpectedly. Code: ${event.code}, Reason: ${event.reason}`);
+        setTimeout(() => {
+          window.location.reload(); // 再接続処理を入れる
+        }, 3000);
       };
 
       setSocket(chatSocket);
@@ -138,7 +141,7 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
                   'Content-Type': 'application/json', 
                   'Authorization': `Bearer ${localStorage.getItem('access_token')}`
                 },
-                body: JSON.stringify({ message: newMessage }),
+                body: JSON.stringify({ message: newMessage, topic_id: id }),
             });
 
             if (res.ok) {
@@ -254,12 +257,15 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
       </div>
 
       {/* 議論要約 */}
-      <button onClick={handleSummarizeDiscussion} disabled={loading}>
+      <button 
+      onClick={handleSummarizeDiscussion} 
+      disabled={loading}
+      className={styles.summaryButton}>
         {loading ? "Summarizing..." : "Summarize Discussion"}
       </button>
 
       {summary && (
-        <div>
+        <div className={styles.summarySection}>
           <h2>Summary</h2>
           <p>{summary}</p>
         </div>
