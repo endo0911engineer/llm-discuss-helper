@@ -66,17 +66,28 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = self.scope["user"]
         message = await sync_to_async(self.save_message)(user, message_text, topic_id)
 
-        # グループ内の全員にメッセージを送信
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message.text,
-                'user': user.username,
-                'topic_id': topic_id,
-            }
-        )
+        if message:
+            # 保存したメッセージをフロントエンドに返す
+            await self.send(json.dumps({
+                "type": "message_saved",
+                "message_id": message.id,  # 保存されたメッセージのIDを返す
+                "user": user.username,
+                "message": message.text,
+                "created_at": message.created_at.isoformat(),
+            }))
 
+            # グループ内の全員にメッセージを送信
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message.text,
+                    'user': user.username,
+                    'topic_id': topic_id,
+                    'message_id': message.id,
+                }
+            )
+            
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
             'message': event['message'],
@@ -98,8 +109,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         
     def save_message(self, user, text, topic_id):
         try:
-            topic_uuid = uuid.UUID(topic_id)  # 文字列をUUID型に変換
-            topic = Topic.objects.get(topic_id=topic_uuid)
+            topic = Topic.objects.get(topic_id=topic_id)
         except ValueError:
             print(f"無効なUUID形式: {topic_id}")
             return None

@@ -5,7 +5,7 @@ from rest_framework import status
 from .models import Message, Topic
 from transformers import pipeline
 from django.shortcuts import get_object_or_404
-import uuid
+from uuid import UUID
 
 # 要約用のパイプライン作成
 summarizer = pipeline("summarization")
@@ -45,43 +45,16 @@ def message_list(request):
     topic = get_object_or_404(Topic, topic_id=topic_id)
     messages = Message.objects.filter(topic=topic).order_by('-created_at')
 
-    return Response({
-        'topic': topic.title,
-        'message': [
-            {
-                'id': msg.id,
-                'user': msg.user.username,
-                'text': msg.text,
-                'created_at': msg.created_at,
-            }
-            for msg in messages
-        ]
-    }, status=status.HTTP_200_OK)
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated]) 
-def post_message(request):
-    message_text = request.data.get('message')
-    topic_id = request.data.get('topic_id')
-
-    print(f"Received topic_id: {topic_id}")
-
-    if not message_text:
-        return Response({'error': 'Message text is required.'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response([
+        {
+            'id': msg.id,
+            'user': msg.user.username,
+            'text': msg.text,
+            'created_at': msg.created_at,
+        }
+        for msg in messages
         
-    try:
-        topic = Topic.objects.get(topic_id=uuid.UUID(topic_id))
-    except Topic.DoesNotExist:
-        return Response({'error': 'Invalid topic_id. Topic not found.'}, status=status.HTTP_404_NOT_FOUND)
-    
-    # メッセージを保存
-    message = Message.objects.create(user=request.user, text=message_text, topic=topic)
-
-    return Response({
-        'message': 'Message created successfully!',
-        'message_id': message.id
-    }, status=status.HTTP_201_CREATED) 
-    
+    ], status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated]) 
@@ -134,7 +107,7 @@ def create_topic(request):
         return Response({'error': 'Title and description are required.'}, status=status.HTTP_400_BAD_REQUEST)
     
     # 一意のIDを作成
-    topic_id = uuid.uuid4()
+    topic_id = UUID()
     # ログインユーザーを取得
     user = request.user
 

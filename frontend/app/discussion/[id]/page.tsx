@@ -17,7 +17,7 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
     const { id } = resolvedParams;
 
     const [user, setUser] = useState(null);
-    const [messages, setMessages] = useState<{ id: number; user: string; text: string; created_at: string; user_icon: string }[]>([]);
+    const [messages, setMessages] = useState<{ id: string | number; user: string; text: string; created_at: string; user_icon: string }[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [discussion, setDiscussion] = useState<Dscussion | null>(null);
     const [summary, setSummary] = useState('');
@@ -118,7 +118,7 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
 
     // メッセージ一覧を取得
     useEffect(() => {
-      fetch('http://127.0.0.1:8000/api/get_messages', {
+      fetch(`http://127.0.0.1:8000/api/get_messages?topic_id=${id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         }
@@ -134,36 +134,11 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
 
         setLoading(true);
 
-        try {
-            const res = await fetch('http://localhost:8000/api/messages/post/', {
-                method: 'POST',
-                headers: { 
-                  'Content-Type': 'application/json', 
-                  'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-                },
-                body: JSON.stringify({ message: newMessage, topic_id: id }),
-            });
-
-            if (res.ok) {
-                const data = await res.json();
-                setMessages((prev) => [
-                    ...prev,
-                    { id: data.message_id,
-                      user: 'You', 
-                      text: newMessage, 
-                      created_at: new Date().toISOString(),
-                      user_icon: data.user_icon || "/default-icon.png" 
-                    },
-                  ]);
-                setNewMessage('');
-            }
-        } catch (error) {
-            console.error('Error sending message:', error);
-        }
-
         // WebSocket経由でメッセージを送信
         if (socket && socket.readyState === WebSocket.OPEN ) {
-          socket.send(JSON.stringify({ message: newMessage }));
+          socket.send(JSON.stringify({ message: newMessage, topic_id: id }));
+
+          setNewMessage('');
         } else {
           console.error("WebSocket is not open. Message not sent.")
         }
