@@ -105,6 +105,23 @@
   cursor: not-allowed;
 }
 
+.deleteButton {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  display: none;
+}
+
+.messageItem:hover .deleteButton {
+  display: block;
+}
+
 .summaryButton {
   margin-top: 20px;
   padding: 10px 20px;

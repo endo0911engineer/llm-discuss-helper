@@ -135,7 +135,19 @@ def delete_topic(request, topic_id):
 
     # ユーザーが作成者が確認
     if topic.created_by != request.user:
-        return Response({'error': 'You do not have permission to delete this topic'}, status=status.HTTP_403_FORBIDDEN)
+        return Response({'error': 'You do not have permission to deete this topic'}, status=status.HTTP_403_FORBIDDEN)
     
     topic.delete()
+    return Response({'message': 'Topic deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_message(request, msg_id):
+    message = get_object_or_404(Message, msg_id=msg_id)
+
+    if message.user != request.user:
+        return Response({'error': 'You do not have permission to delete this message'}, status=status.HTTP_403_FORBIDDEN)
+    
+    message.delete()
     return Response({'message': 'Topic deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)

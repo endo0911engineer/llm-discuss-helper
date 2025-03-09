@@ -17,12 +17,13 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
     const { id } = resolvedParams;
 
     const [user, setUser] = useState(null);
-    const [messages, setMessages] = useState<{ id: string | number; user: string; text: string; created_at: string; user_icon: string }[]>([]);
+    const [messages, setMessages] = useState<{ id: string | number, user: string; text: string; created_at: string; user_icon: string }[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [discussion, setDiscussion] = useState<Dscussion | null>(null);
     const [summary, setSummary] = useState('');
     const [loading, setLoading] = useState(false);
     const [socket, setSocket] = useState<WebSocket | null>(null);
+    const [hoveredMessageId, setHoveredMessageId] = useState<string | number>(-1);
 
     // WebSocket接続の設定
     useEffect(() => {
@@ -171,6 +172,27 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
       setLoading(false);
     }
 
+    // メッセージを削除するリクエスト
+    const handleDeleteMessage = async (msg_id: string | number) => {
+      try {
+        const res = await fetch(`http://localhost:8000/api/delete_message/${msg_id}/`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete message");
+      }
+
+      setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== msg_id));
+
+      } catch (error) {
+        console.error('Error deleting message:', error)
+      }
+    }
+
     return (
       <div className={styles.container}>
       <h1 className={styles.heading}>議論ページ</h1>
@@ -193,6 +215,8 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
             <div 
             key={msg.id} 
             className={`${styles.messageItem} ${msg.user === user ? styles.messageRight : styles.messageLeft}`}
+            onMouseEnter={() => setHoveredMessageId(msg.id)}
+            onMouseLeave={() => setHoveredMessageId(-1)}
             >
               <img
                 src={msg.user_icon}
@@ -205,6 +229,14 @@ export default function DiscussionPage({ params }: { params: Promise<{ id: strin
                 <br />
                 <small className={styles.messageDate}>{new Date(msg.created_at).toLocaleString()}</small>
               </div>
+              {hoveredMessageId === msg.id && (
+                <button
+                className={styles.deleteButton}
+                onClick={() => handleDeleteMessage(msg.id)}
+                >
+                  ✕
+                </button>
+              )}
             </div>
           ))}
         </div>
