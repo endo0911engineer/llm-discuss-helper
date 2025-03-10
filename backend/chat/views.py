@@ -12,21 +12,21 @@ summarizer = pipeline("summarization")
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated]) 
-def summarize_messages(request):
-    # 指定されたtopic_idのメッセージを要約する。
-    topic_id = request.query_params.get('topic_id')
-    if not topic_id:
-        return Response({'error': 'topic_id is required'}, status=status.HTTP_400_BAD_REQUEST)
-    
+def summarize_messages(request, topic_id):
+
     topic = get_object_or_404(Topic, topic_id=topic_id)
     messages = Message.objects.filter(topic=topic).order_by('-created_at')
+    formatted_messages = "\n".join([f"{msg.user.username}: {msg.text}" for msg in messages])
 
-    # メッセージのテキストをまとめて要約する。
-    message_texts = "\n".join([msg.text for msg in messages])
-    if not message_texts:
+    prompt = f"""
+    以下はとあるチャットトピックのメッセージ一覧です。この会話の要点を簡潔に150文字以内で要約してください。
+    {formatted_messages}
+    """
+
+    if not formatted_messages:
         summary = "まだメッセージはありません。"
     else:
-        summary_result = summarizer(message_texts, max_length=150, min_length=50, do_sample=False)
+        summary_result = summarizer(prompt, max_length=150, min_length=50, do_sample=False)
         summary = summary_result[0]['summary_text']
 
     return Response({
@@ -144,7 +144,7 @@ def delete_topic(request, topic_id):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_message(request, msg_id):
-    message = get_object_or_404(Message, msg_id=msg_id)
+    message = get_object_or_404(Message, id=msg_id)
 
     if message.user != request.user:
         return Response({'error': 'You do not have permission to delete this message'}, status=status.HTTP_403_FORBIDDEN)
